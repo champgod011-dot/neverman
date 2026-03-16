@@ -633,3 +633,56 @@ PlayerTab:Toggle({
         end
     end
 })
+
+--// เพิ่มตัวแปรสำหรับมุดดิน
+local UndergroundEnabled = false
+local UndergroundDepth = -5
+
+--// [ส่วนที่เพิ่มเข้าไปใน PLAYER TAB]
+local UnderSection = PlayerTab:Section({Title = "Underground Snap"})
+
+PlayerTab:Toggle({
+    Title = "Enable Underground (มุดดิน)",
+    Default = false,
+    Callback = function(v)
+        UndergroundEnabled = v
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        
+        if not v and hum then
+            hum.HipHeight = 2 -- กลับมาเป็นค่าปกติ (ความสูงปกติของตัวละคร)
+        end
+    end
+})
+
+PlayerTab:Slider({
+    Title = "Depth (ระดับความลึก)",
+    Step = 0.1,
+    Value = {
+        Min = -20,
+        Max = 2,
+        Default = -5
+    },
+    Callback = function(v)
+        UndergroundDepth = v
+        -- ปรับแบบ Real-time ทันทีที่เลื่อน
+        if UndergroundEnabled then
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.HipHeight = v
+            end
+        end
+    end
+})
+
+--// เพิ่มระบบ Loop ใน Heartbeat (เพื่อให้มุดค้างไว้ตลอด)
+RunService.Heartbeat:Connect(function()
+    if UndergroundEnabled then
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum and hum.HipHeight ~= UndergroundDepth then
+            hum.HipHeight = UndergroundDepth
+        end
+    end
+end)
