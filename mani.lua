@@ -1,5 +1,5 @@
 --// CONFIG
-local SilentAimEnabled = true
+local SilentAimEnabled = false
 local FOV = 150
 getgenv().AntiAimbot = false
 
@@ -634,55 +634,48 @@ PlayerTab:Toggle({
     end
 })
 
---// เพิ่มตัวแปรสำหรับมุดดิน
-local UndergroundEnabled = false
-local UndergroundDepth = -5
+local SnapUnderground = false
+local SnapDepth = 0
+local LastY = 0
 
---// [ส่วนที่เพิ่มเข้าไปใน PLAYER TAB]
 local UnderSection = PlayerTab:Section({Title = "Underground Snap"})
 
 PlayerTab:Toggle({
-    Title = "Enable Underground (มุดดิน)",
+    Title = "Enable Underground Snap",
     Default = false,
     Callback = function(v)
-        UndergroundEnabled = v
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        
-        if not v and hum then
-            hum.HipHeight = 2 -- กลับมาเป็นค่าปกติ (ความสูงปกติของตัวละคร)
-        end
-    end
-})
-
-PlayerTab:Slider({
-    Title = "Depth (ระดับความลึก)",
-    Step = 0.1,
-    Value = {
-        Min = -20,
-        Max = 2,
-        Default = -5
-    },
-    Callback = function(v)
-        UndergroundDepth = v
-        -- ปรับแบบ Real-time ทันทีที่เลื่อน
-        if UndergroundEnabled then
-            local char = LocalPlayer.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum.HipHeight = v
+        SnapUnderground = v
+        if v and LocalPlayer.Character then
+            LastY = LocalPlayer.Character:GetPivot().Position.Y
+        else
+            if LocalPlayer.Character then
+                local current = LocalPlayer.Character:GetPivot()
+                LocalPlayer.Character:PivotTo(CFrame.new(current.Position.X, LastY, current.Position.Z) * current.Rotation)
             end
         end
     end
 })
 
---// เพิ่มระบบ Loop ใน Heartbeat (เพื่อให้มุดค้างไว้ตลอด)
+PlayerTab:Slider({
+    Title = "Depth",
+    Step = 0.5,
+    Value = {Min = 1, Max = 300, Default = 0},
+    Callback = function(v)
+        SnapDepth = v
+        if SnapUnderground and LocalPlayer.Character then
+            local currentPivot = LocalPlayer.Character:GetPivot()
+            LocalPlayer.Character:PivotTo(CFrame.new(currentPivot.Position.X, LastY - v, currentPivot.Position.Z) * currentPivot.Rotation)
+        end
+    end
+})
+
 RunService.Heartbeat:Connect(function()
-    if UndergroundEnabled then
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum and hum.HipHeight ~= UndergroundDepth then
-            hum.HipHeight = UndergroundDepth
+    if SnapUnderground and LocalPlayer.Character then
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local currentPivot = LocalPlayer.Character:GetPivot()
+            LocalPlayer.Character:PivotTo(CFrame.new(currentPivot.Position.X, LastY - SnapDepth, currentPivot.Position.Z) * currentPivot.Rotation)
+            hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, 0, hrp.AssemblyLinearVelocity.Z)
         end
     end
 end)
