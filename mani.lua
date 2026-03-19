@@ -587,8 +587,8 @@ RunService.Heartbeat:Connect(function()
         local oldVel = Root.Velocity
         local oldLin = Root.AssemblyLinearVelocity
         local oldAng = Root.AssemblyAngularVelocity
+        local camCF = Camera.CFrame
         
-        -- Velocity Spike
         local mult = math.random(1500,3000)
         local fakeVel = oldLin * mult
         
@@ -596,18 +596,10 @@ RunService.Heartbeat:Connect(function()
         Root.AssemblyLinearVelocity = fakeVel
         Root.AssemblyAngularVelocity = fakeVel
 
-        -- Random Position Offset
         Root.CFrame = Root.CFrame + Vector3.new(
             math.random(-3,3),
             math.random(-2,2),
             math.random(-3,3)
-        )
-
-        -- Sky AntiLock
-        Root.CFrame = Root.CFrame * CFrame.Angles(
-            math.rad(math.random(-180,180)),
-            math.rad(math.random(-180,180)),
-            0
         )
 
         RunService.RenderStepped:Wait()
@@ -615,6 +607,9 @@ RunService.Heartbeat:Connect(function()
         Root.Velocity = oldVel
         Root.AssemblyLinearVelocity = oldLin
         Root.AssemblyAngularVelocity = oldAng
+        
+        -- คืนค่ากล้อง
+        Camera.CFrame = camCF
     end
 end)
 
