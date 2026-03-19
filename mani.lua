@@ -575,24 +575,24 @@ end)
 
 --// ANTI-AIMBOT HEARTBEAT
 RunService.Heartbeat:Connect(function()
-if getgenv().AntiAimbot and LocalPlayer.Character then
-local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-if RootPart and Humanoid and Humanoid.Health > 0 then
-local OldVec = RootPart.Velocity
-local LineraVelcoity = RootPart.AssemblyLinearVelocity
-local Angular = RootPart.AssemblyAngularVelocity
-local x,y,z = math.random(2000,4500),math.random(5000,7500),math.random(5000,7500)
-local LandVec = Vector3.new(RootPart.AssemblyLinearVelocity.X * x, RootPart.AssemblyLinearVelocity.Y * y, RootPart.AssemblyLinearVelocity.Z * z)
-RootPart.Velocity = LandVec
-RootPart.AssemblyLinearVelocity = LandVec
-RootPart.AssemblyAngularVelocity = LandVec
-RunService.RenderStepped:Wait()
-RootPart.Velocity = OldVec
-RootPart.AssemblyLinearVelocity = LineraVelcoity
-RootPart.AssemblyAngularVelocity = Angular
-end
-end
+    if getgenv().AntiAimbot and LocalPlayer.Character then
+        local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if RootPart and Humanoid and Humanoid.Health > 0 then
+            local OldVec = RootPart.Velocity
+            local LineraVelcoity = RootPart.AssemblyLinearVelocity
+            local Angular = RootPart.AssemblyAngularVelocity
+            local x, y, z = math.random(2000, 4500), math.random(5000, 7500), math.random(5000, 7500)
+            local LandVec = Vector3.new(LineraVelcoity.X * x, LineraVelcoity.Y * y, LineraVelcoity.Z * z)
+            RootPart.Velocity = LandVec
+            RootPart.AssemblyLinearVelocity = LandVec
+            RootPart.AssemblyAngularVelocity = LandVec
+            RunService.RenderStepped:Wait()
+            RootPart.Velocity = OldVec
+            RootPart.AssemblyLinearVelocity = LineraVelcoity
+            RootPart.AssemblyAngularVelocity = Angular
+        end
+    end
 end)
 
 local Net = require(ReplicatedStorage.Modules.Core.Net)
