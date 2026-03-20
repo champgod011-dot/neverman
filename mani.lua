@@ -575,20 +575,15 @@ end)
 
 --// ANTI-AIMBOT HEARTBEAT
 RunService.Heartbeat:Connect(function()
-        if not getgenv().AntiAimbot or not Root or not Hum or Hum.Health <= 0 then return end
+    local Character = Client.Character
+    local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+    local Hum = Character and Character:FindFirstChild("Humanoid")
+
+    if getgenv().AntiAimbot and Root and Hum and Hum.Health > 0 then 
+        local OldCF, OldVel, OldRot = Root.CFrame, Root.AssemblyLinearVelocity, Root.AssemblyAngularVelocity
+        local T = tick() * 10 -- ใช้เวลาแทน Angle (ปรับเลข 10 เพื่อคุมความเร็วการหมุน)
         
-        local OldCF = Root.CFrame
-        local OldVel = Root.AssemblyLinearVelocity
-        local OldRot = Root.AssemblyAngularVelocity
-        
-        Angle = Angle + 0.8
-        local Offset = Vector3.new(0, 0, 0)
-        
-        if getgenv().DesyncMode == "Circle" then
-            Offset = Vector3.new(math.cos(Angle) * getgenv().DesyncRange, 0, math.sin(Angle) * getgenv().DesyncRange)
-        elseif getgenv().DesyncMode == "Jitter" then
-            Offset = Vector3.new(math.random(-getgenv().DesyncRange, getgenv().DesyncRange), 0, math.random(-getgenv().DesyncRange, getgenv().DesyncRange))
-        end
+        local Offset = (getgenv().DesyncMode == "Circle" and Vector3.new(math.cos(T) * getgenv().DesyncRange, 0, math.sin(T) * getgenv().DesyncRange)) or (getgenv().DesyncMode == "Jitter" and Vector3.new(math.random(-getgenv().DesyncRange, getgenv().DesyncRange), 0, math.random(-getgenv().DesyncRange, getgenv().DesyncRange))) or Vector3.new(0,0,0)
 
         local FakeVel = Vector3.new(getgenv().VelocityIntensity, getgenv().VelocityIntensity, getgenv().VelocityIntensity)
         if tick() % 0.2 > 0.1 then FakeVel = FakeVel * -1 end
@@ -604,8 +599,8 @@ RunService.Heartbeat:Connect(function()
             Root.AssemblyLinearVelocity = OldVel
             Root.AssemblyAngularVelocity = OldRot
         end
-    end)
-end
+    end
+end)
 
 local Net = require(ReplicatedStorage.Modules.Core.Net)
 local SprintModule = require(ReplicatedStorage.Modules.Game.Sprint)
