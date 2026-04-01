@@ -249,32 +249,18 @@ end
 -- // HOOKING
 local send = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Send")
 local oldFire
-
 oldFire = hookfunction(send.FireServer, function(self, ...)
     local args = {...}
-
     if SilentAimEnabled and IsHoldingAllowedGun(args) then
-        local target = GetClosestTarget()
-
-        if target and target.Character and target.Character:FindFirstChild("Head") then
-            local targetHead = target.Character.Head
-            local aimPos = PredictPosition(targetHead)
-
-            -- ใช้กล้องจริงแทน 1/0 เพื่อไม่ให้ดาเมจเป็น 0
-            args[4] = Camera.CFrame
-
-            -- hit data
-            args[5] = {
-                [1] = {
-                    [1] = {
-                        ["Instance"] = targetHead,
-                        ["Position"] = aimPos
-                    }
-                }
-            }
+        CurrentTarget = GetClosestTarget()
+        if CurrentTarget and CurrentTarget.Character and CurrentTarget.Character:FindFirstChild("Head") then
+            head = CurrentTarget.Character.Head
+            aimPos = PredictPosition(head)
+            
+            args[4] = CFrame.new(math.huge, math.huge, math.huge)
+            args[5] = {[1]={[1]={["Instance"]=head,["Position"]=aimPos}}}
         end
     end
-
     return oldFire(self, unpack(args))
 end)
 
