@@ -959,9 +959,9 @@ MainTab:Toggle({
 
 
 
-local EnabledInfiniteStamina = false
+getgenv().InfiniteStamina = false
+local __HookDone = false
 
--- สร้าง toggle บนเมนู
 MainTab:Toggle(
     {
         Title = "Infinite Stamina",
@@ -969,25 +969,47 @@ MainTab:Toggle(
         Type = "Checkbox",
         Value = false,
         Callback = function(Value)
-            EnabledInfiniteStamina = Value
+            getgenv().InfiniteStamina = Value
+
+            if Value and not __HookDone then
+                __HookDone = true
+
+                task.spawn(function()
+                    local Net = require(ReplicatedStorage.Modules.Core.Net)
+                    local SprintModule = require(ReplicatedStorage.Modules.Game.Sprint)
+
+                    if not getgenv().Bypassed then
+                        local func = debug.getupvalue(Net.get, 2)
+                        debug.setconstant(func, 3, '__Bypass')
+                        debug.setconstant(func, 4, '__Bypass')
+                        getgenv().Bypassed = true
+                    end
+
+                    repeat task.wait() until getgenv().Bypassed
+
+                    RunService.Heartbeat:Connect(function()
+                        if getgenv().InfiniteStamina then
+                            Net.send("set_sprinting_1", true)
+                        end
+                    end)
+
+                    local consume_stamina = SprintModule.consume_stamina
+                    local SprintBar = debug.getupvalue(consume_stamina, 2).sprint_bar
+                    local __InfiniteStamina = SprintBar.update
+
+                    SprintBar.update = function(...)
+                        if getgenv().InfiniteStamina then
+                            return __InfiniteStamina(function()
+                                return 0.5
+                            end)
+                        end
+                        return __InfiniteStamina(...)
+                    end
+                end)
+            end
         end
     }
 )
-
--- เก็บฟังก์ชันเดิมของ SprintBar.update ไว้
-local OldUpdate = SprintBar.update
-
--- เขียนฟังก์ชันใหม่แทนที่
-SprintBar.update = function(...)
-    if EnabledInfiniteStamina then
-        -- ถ้าเปิดโหมด Infinite Stamina ให้คืนค่าเต็ม (1)
-        return 0.9
-    else
-        -- ถ้าปิด ให้ทำงานตามปกติ
-        return OldUpdate(...)
-    end
-end
-
 
 
 MainTab:Section(
