@@ -334,7 +334,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Nexus x dev | block spin 👨‍💻",
-    Icon = "rbxassetid://137877095538630",
+    Icon = "rbxassetid://72830195117719",
     Author = "By Quality | Free 💸",
     Folder = "MySuperHub",
     Size = UDim2.fromOffset(580, 460),
@@ -368,7 +368,7 @@ ScreenGui.Parent = CoreGui
 ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
 ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
 ToggleBtn.BackgroundTransparency = 1
-ToggleBtn.Image = "rbxassetid://137877095538630" 
+ToggleBtn.Image = "rbxassetid://72830195117719" 
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 ToggleBtn.Parent = ScreenGui
